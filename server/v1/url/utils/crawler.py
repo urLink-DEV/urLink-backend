@@ -19,7 +19,9 @@ class Crawler:
             'Sec-Fetch-Dest': 'document'
         }
         try:
-            return requests.get(self.path, headers=headers, timeout=5).text
+            response = requests.get(self.path, headers=headers, timeout=5)
+            response.encoding = None
+            return response.text
         except Exception as e:
             return str(e)
 
