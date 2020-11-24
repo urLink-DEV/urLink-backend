@@ -3,14 +3,13 @@ import string
 
 from django.contrib.auth import login, logout
 from rest_framework import generics, status, views
-from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenVerifyView, TokenRefreshView
 
 from server.exceptions import ServerException
 from server.models.user import User, UserSerializer, UserSignInSerializer
-from server.permissions import IsObjectMe, GoogleAccessToken
+from server.permissions import GoogleAccessToken
 from server.v1.user.custom_serializer import CustomTokenVerifySerializer
 
 
@@ -19,15 +18,15 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
         ## `JWT 필요`
         ## Headers
             - Authorization : JWT <토큰>
-        ## Path Params
-            - id : 유저 id(이메일주소 X)
         ## Body(UPDATE 요청 시)
             - username : 유저네임
             - password : 패스워드(6자리 이상)
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated, IsObjectMe]
+
+    def get_object(self):
+        return self.request.user
 
 
 class SignUpView(generics.CreateAPIView):
@@ -93,7 +92,7 @@ class SignoutView(views.APIView):
         try:
             token = RefreshToken(refresh_token)
         except Exception:
-            raise ServerException('유효하지않은 Refresh 토큰입니다.')
+            raise ServerException('유효하지 않은 Refresh 토큰입니다.')
         token.blacklist()
         logout(self.request)
         return Response({'logout': True, 'message': '해당 Refresh 토큰은 이제 사용할 수 없습니다.'})
@@ -122,12 +121,11 @@ class GoogleSignUpView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         response = GoogleAccessToken(request.data.get("token")).is_valid()
         if not response:
-            content = {'message': 'wrong google token / this google token is already expired.'}
+            content = {'message': '유효하지 않은 토큰 혹은 email 정보를 가져올 수 없습니다.'}
             return Response(content, status=status.HTTP_401_UNAUTHORIZED)
 
-        user_email = response['email']
-        request.data['username'] = response.get('name', user_email.split('@')[0])
-        request.data['email'] = user_email
+        request.data['username'] = response['username']
+        request.data['email'] = response['email']
         request.data['password'] = self.make_random_string_for_password()
         request.data['sign_up_type'] = 'google'
         request.data.pop('token', None)
