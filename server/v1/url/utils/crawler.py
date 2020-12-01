@@ -35,6 +35,15 @@ class Crawler:
                 return html.find('link', key).get('href')
         return '알수없음'
 
+    def is_correct_image(self, image_path):
+        response = requests.get(image_path)
+        try:
+            if "image" in response.headers['Content-Type']:
+                return True
+        except Exception as e:
+            print(e)
+        return False
+
     def parse_html(self, html):
         soup = BeautifulSoup(html, 'html.parser')
         head = soup.head
@@ -55,7 +64,7 @@ class Crawler:
         image_path = self.get_meta_data(head, [{'property': 'og:image'}, {'property': 'twitter:image'}])
         favicon_path = self.get_favicon(head, [{'rel': 'shortcut icon'}, {'rel': 'icon'}])
 
-        if image_path == '알수없음':
+        if image_path == '알수없음' or not self.is_correct_image(image_path):
             image_path = self.IMAGE_404
         if urlparse(image_path).scheme == '' and urlparse(image_path).netloc == '':
             url = urlparse(self.path)
@@ -85,12 +94,6 @@ if __name__ == "__main__":
     from pprint import pprint
 
     c = Crawler()
-    for path in ['abc', 'https://programmers.co.kr/learn/challenges?tab=all_challenges', 'https://www.acmicpc.net/',
-                 'https://ssungkang.tistory.com/category/%EC%9B%B9%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D/Django',
-                 'https://tech.cloud.nongshim.co.kr/techblog/', 'https://mail.google.com/mail/u/0/#inbox',
-                 'https://syundev.tistory.com/29?category=868616', 'https://github.com/hotire/turnover-story',
-                 'http://www.bloter.net/archives/257437',
-                 'https://www.youtube.com/watch?v=r6TFnNQsQLY&feature=youtu.be',
-                 'https://ofcourse.kr/css-course/cursor-%EC%86%8D%EC%84%B1']:
+    for path in ['https://www.kobaco.co.kr/site/main/content/what_public_ad']:
         html = c.get_html(path)
         pprint(c.parse_html(html))
