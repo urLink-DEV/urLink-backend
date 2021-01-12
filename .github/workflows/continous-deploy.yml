@@ -22,5 +22,5 @@ jobs:
         script_stop: true
         script: |
           cd projects/Team_Web_1_Backend/
-          source venv/bin/activate
+          source venv3.7/bin/activate
           sh deploy.sh
