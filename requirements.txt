@@ -16,3 +16,4 @@ django-redis==4.12.1
 django-crontab==0.7.1
 asgiref==3.2.3
 aiohttp==3.7.3
+PyJWT==1.7.1
