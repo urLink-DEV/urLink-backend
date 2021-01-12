@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 
 class Crawler:
-    IMAGE_404 = 'https://urlink.s3.ap-northeast-2.amazonaws.com/static/404-image.png'
+    IMAGE_404 = 'https://urlink.s3.ap-northeast-2.amazonaws.com/static/404-image-20210113.png'
     IMAGE_FAVICON = 'https://urlink.s3.ap-northeast-2.amazonaws.com/static/favicon.png'
     HEADERS = {
         'Connection': 'keep-alive',
