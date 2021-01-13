@@ -55,7 +55,7 @@ class UrlListCreateAPIView(generics.ListCreateAPIView):
                                                                                             :100]
             request.data['image_path'] = parsed_html['image_path']
             request.data['favicon_path'] = parsed_html['favicon_path']
-            results.append(await asyncio.gather(self._save(request, *args, **kwargs)))
+            results.extend(await asyncio.gather(self._save(request, *args, **kwargs)))
         return results
 
     @sync_to_async
