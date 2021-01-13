@@ -17,3 +17,4 @@ django-crontab==0.7.1
 asgiref==3.2.3
 aiohttp==3.7.3
 PyJWT==1.7.1
+mysqlclient==2.0.1
