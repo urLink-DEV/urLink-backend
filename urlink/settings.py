@@ -119,6 +119,9 @@ if gethostname().startswith('urlink'):
             'PASSWORD': secrets['DATABASES_PASSWORD'],  # 계정 비밀번호
             'HOST': secrets['DATABASES_HOST'],  # 데이테베이스 주소(IP)
             'PORT': '3306',  # 데이터베이스 포트(보통은 3306)
+            'OPTIONS': {
+                'charset': 'utf8mb4'
+            }
         }
     }
 else:
