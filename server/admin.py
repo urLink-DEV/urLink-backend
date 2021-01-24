@@ -12,7 +12,19 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ('sign_up_type', 'email', 'username', 'is_superuser', 'date_joined')
 
 
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('user', 'name', 'updated_at')
+
+
+class UrlAdmin(admin.ModelAdmin):
+    list_display = ('user', 'title', 'path', 'updated_at')
+
+
+class AlarmAdmin(admin.ModelAdmin):
+    list_display = ('user', 'url', 'has_been_sent', 'has_done', 'has_read', 'reserved_time', 'updated_at')
+
+
 admin.site.register(User, UserAdmin)
-admin.site.register(Category)
-admin.site.register(Url)
-admin.site.register(Alarm)
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(Url, UrlAdmin)
+admin.site.register(Alarm, AlarmAdmin)
