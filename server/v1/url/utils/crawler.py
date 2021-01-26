@@ -9,6 +9,8 @@ from bs4 import BeautifulSoup
 class Crawler:
     IMAGE_404 = 'https://urlink.s3.ap-northeast-2.amazonaws.com/static/404-image-20210113.png'
     IMAGE_FAVICON = 'https://urlink.s3.ap-northeast-2.amazonaws.com/static/favicon.png'
+    DEFAULT_TITLE_TEXT = '제목을 가져오지 못했어요. 직접 제목을 입력해보세요.'
+    DEFAULT_DESCRIPTION_TEXT = '본문을 가져오지 못했어요. 저장한 링크의 내용을 간단히 기록해보세요.'
     HEADERS = {
         'Connection': 'keep-alive',
         'Pragma': 'no-cache',
@@ -39,7 +41,8 @@ class Crawler:
 
     def get_meta_data(self, html, keys):
         for key in keys:
-            if html.find('meta', key) and html.find('meta', key).get('content') and not html.find('meta', key).get('content').isspace():
+            if html.find('meta', key) and html.find('meta', key).get('content') and \
+                    not html.find('meta', key).get('content').isspace():
                 return html.find('meta', key).get('content')
         return None
 
@@ -86,8 +89,8 @@ class Crawler:
 
         if not head:
             return {
-                'title': None,
-                'description': None,
+                'title': Crawler.DEFAULT_TITLE_TEXT,
+                'description': Crawler.DEFAULT_DESCRIPTION_TEXT,
                 'image_path': Crawler.IMAGE_404,
                 'favicon_path': Crawler.IMAGE_FAVICON
             }
@@ -102,8 +105,8 @@ class Crawler:
         favicon_path = self.check_path("favicon", self.get_favicon(head, [{'rel': 'shortcut icon'}, {'rel': 'icon'}]))
 
         return {
-            'title': title[:500] if title else title,
-            'description': description[:500] if description else description,
+            'title': title[:500] if title else Crawler.DEFAULT_TITLE_TEXT,
+            'description': description[:500] if description else Crawler.DEFAULT_DESCRIPTION_TEXT,
             'image_path': image_path,
             'favicon_path': favicon_path
         }
