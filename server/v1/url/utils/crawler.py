@@ -39,7 +39,7 @@ class Crawler:
 
     def get_meta_data(self, html, keys):
         for key in keys:
-            if html.find('meta', key) and html.find('meta', key).get('content'):
+            if html.find('meta', key) and html.find('meta', key).get('content') and not html.find('meta', key).get('content').isspace():
                 return html.find('meta', key).get('content')
         return '알수없음'
 
@@ -97,7 +97,8 @@ class Crawler:
         else:
             title = self.get_meta_data(head, [{'name': 'title'}, {'property': 'og:title'}])
         description = self.get_meta_data(head, [{'name': 'description'}, {'property': 'og:description'}])
-        image_path = self.check_path("image", self.get_meta_data(head, [{'property': 'og:image'}, {'property': 'twitter:image'}]))
+        image_path = self.check_path("image", self.get_meta_data(head, [{'property': 'og:image'},
+                                                                        {'property': 'twitter:image'}]))
         favicon_path = self.check_path("favicon", self.get_favicon(head, [{'rel': 'shortcut icon'}, {'rel': 'icon'}]))
 
         return {
@@ -118,10 +119,8 @@ if __name__ == "__main__":
     from pprint import pprint
     import time
 
-    # 1. async
-    print("###async start###")
-    start = time.time()
     urls = ['abc',
+            'https://woowabros.github.io/experience/2020/10/08/excel-download.html',
             'https://programmers.co.kr/learn/challenges?tab=all_challenges',
             'https://www.acmicpc.net/',
             'https://ssungkang.tistory.com/category/%EC%9B%B9%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D/Django',
@@ -134,6 +133,10 @@ if __name__ == "__main__":
             'https://ofcourse.kr/css-course/cursor-%EC%86%8D%EC%84%B1',
             'https://material.io/design/layout/responsive-layout-grid.html',
             'https://www.kobaco.co.kr/site/main/content/what_public_ad']
+
+    # 1. async
+    print("###async start###")
+    start = time.time()
     asyncio.run(main())
     print("async : ", time.time() - start)
 
@@ -142,19 +145,7 @@ if __name__ == "__main__":
     print("###sync start###")
     start = time.time()
     c = Crawler()
-    for path in ['abc',
-                 'https://programmers.co.kr/learn/challenges?tab=all_challenges',
-                 'https://www.acmicpc.net/',
-                 'https://ssungkang.tistory.com/category/%EC%9B%B9%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D/Django',
-                 'https://tech.cloud.nongshim.co.kr/techblog/',
-                 'https://mail.google.com/mail/u/0/#inbox',
-                 'https://syundev.tistory.com/29?category=868616',
-                 'https://github.com/hotire/turnover-story',
-                 'http://www.bloter.net/archives/257437',
-                 'https://www.youtube.com/watch?v=r6TFnNQsQLY&feature=youtu.be',
-                 'https://ofcourse.kr/css-course/cursor-%EC%86%8D%EC%84%B1',
-                 'https://material.io/design/layout/responsive-layout-grid.html',
-                 'https://www.kobaco.co.kr/site/main/content/what_public_ad']:
+    for path in urls:
         html = c.get_html_by_sync(path)
         pprint(c.parse_html(html))
     print("sync : ", time.time() - start)
