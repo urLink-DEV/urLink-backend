@@ -4,6 +4,9 @@ from urllib.parse import urlparse
 import aiohttp
 import requests
 from bs4 import BeautifulSoup
+from django.conf import settings
+
+from server.exceptions import ServerException
 
 
 class Crawler:
@@ -39,7 +42,8 @@ class Crawler:
 
     def get_meta_data(self, html, keys):
         for key in keys:
-            if html.find('meta', key) and html.find('meta', key).get('content') and not html.find('meta', key).get('content').isspace():
+            if html.find('meta', key) and html.find('meta', key).get('content') and not html.find('meta', key).get(
+                    'content').isspace():
                 return html.find('meta', key).get('content')
         return '알수없음'
 
@@ -80,6 +84,13 @@ class Crawler:
             else:
                 return default_path_dict[type]
 
+    def shorten_path(self, path):
+        response = requests.get(f"http://cutt.ly/api/api.php?key={settings.CUTTLY_API_KEY}&short={path}")
+
+        if response.json()["url"]["status"] != 7:
+            raise ServerException(f"{path}는 등록할 수 없습니다.")
+        return response.json()["url"]["shortLink"]
+
     def parse_html(self, html):
         soup = BeautifulSoup(html, 'html.parser')
         head = soup.head
@@ -87,7 +98,7 @@ class Crawler:
         if not head:
             return {
                 'title': '알수없음',
-                'description': '알수없음',
+                'description': None,
                 'image_path': Crawler.IMAGE_404,
                 'favicon_path': Crawler.IMAGE_FAVICON
             }
@@ -102,8 +113,8 @@ class Crawler:
         favicon_path = self.check_path("favicon", self.get_favicon(head, [{'rel': 'shortcut icon'}, {'rel': 'icon'}]))
 
         return {
-            'title': title,
-            'description': description,
+            'title': title[:25],
+            'description': None if description == "알수없음" else description[:100],
             'image_path': image_path,
             'favicon_path': favicon_path
         }
@@ -149,3 +160,6 @@ if __name__ == "__main__":
         html = c.get_html_by_sync(path)
         pprint(c.parse_html(html))
     print("sync : ", time.time() - start)
+
+    for url in urls:
+        c.shorten_path(url)
