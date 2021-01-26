@@ -50,9 +50,8 @@ class UrlListCreateAPIView(generics.ListCreateAPIView):
         for index, html in enumerate(htmls):
             parsed_html = crawler.parse_html(html)
             request.data['path'] = paths[index]
-            request.data['title'] = parsed_html['title'][:25]
-            request.data['description'] = None if parsed_html['description'] == '알수없음' else parsed_html['description'][
-                                                                                            :100]
+            request.data['title'] = parsed_html['title']
+            request.data['description'] = parsed_html['description']
             request.data['image_path'] = parsed_html['image_path']
             request.data['favicon_path'] = parsed_html['favicon_path']
             results.extend(await asyncio.gather(self._save(request, *args, **kwargs)))
