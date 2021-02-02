@@ -19,13 +19,13 @@ import redis
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+secrets = json.load(open(os.path.join(os.path.join(BASE_DIR, 'urlink'), 'secrets.json'), 'rb'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '$@m!+cqav*c!i2&x8+ys)d)#mv^zdh_z=*=7r9*f@6vg@f8b1g'
-GOOGLE_API_KEY = 'AIzaSyD9VzCBawbBZR6LNJdbFWVJF_HYdiGQc_Y'
-CUTTLY_API_KEY = 'b28d368212cbcf1cb049ec51d653401c66a5f'
+SECRET_KEY = secrets['SECRET_KEY']
+GOOGLE_API_KEY = secrets['GOOGLE_API_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -111,7 +111,6 @@ WSGI_APPLICATION = 'urlink.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 if gethostname().startswith('urlink'):
-    secrets = json.load(open(os.path.join(os.path.join(BASE_DIR, 'urlink'), 'secrets.json'), 'rb'))
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
