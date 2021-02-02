@@ -12,6 +12,8 @@ from server.exceptions import ServerException
 class Crawler:
     IMAGE_404 = 'https://urlink.s3.ap-northeast-2.amazonaws.com/static/404-image-20210113.png'
     IMAGE_FAVICON = 'https://urlink.s3.ap-northeast-2.amazonaws.com/static/favicon.png'
+    DEFAULT_TITLE_TEXT = '제목을 가져오지 못했어요. 직접 제목을 입력해보세요.'
+    DEFAULT_DESCRIPTION_TEXT = '본문을 가져오지 못했어요. 저장한 링크의 내용을 간단히 기록해보세요.'
     HEADERS = {
         'Connection': 'keep-alive',
         'Pragma': 'no-cache',
@@ -42,16 +44,16 @@ class Crawler:
 
     def get_meta_data(self, html, keys):
         for key in keys:
-            if html.find('meta', key) and html.find('meta', key).get('content') and not html.find('meta', key).get(
-                    'content').isspace():
+            if html.find('meta', key) and html.find('meta', key).get('content') and \
+                    not html.find('meta', key).get('content').isspace():
                 return html.find('meta', key).get('content')
-        return '알수없음'
+        return None
 
     def get_favicon(self, html, keys):
         for key in keys:
             if html.find('link', key) and html.find('link', key).get('href'):
                 return html.find('link', key).get('href')
-        return '알수없음'
+        return None
 
     def is_correct_image(self, path):
         try:
@@ -75,7 +77,7 @@ class Crawler:
     def check_path(self, type, path):
         default_path_dict = {"image": Crawler.IMAGE_404, "favicon": Crawler.IMAGE_FAVICON}
 
-        if path == "알수없음":
+        if path is None:
             return default_path_dict[type]
         else:
             path = self.attach_full_scheme_on_path(path)
@@ -97,8 +99,8 @@ class Crawler:
 
         if not head:
             return {
-                'title': '알수없음',
-                'description': None,
+                'title': Crawler.DEFAULT_TITLE_TEXT,
+                'description': Crawler.DEFAULT_DESCRIPTION_TEXT,
                 'image_path': Crawler.IMAGE_404,
                 'favicon_path': Crawler.IMAGE_FAVICON
             }
@@ -113,8 +115,8 @@ class Crawler:
         favicon_path = self.check_path("favicon", self.get_favicon(head, [{'rel': 'shortcut icon'}, {'rel': 'icon'}]))
 
         return {
-            'title': title[:25],
-            'description': None if description == "알수없음" else description[:100],
+            'title': title[:500] if title else Crawler.DEFAULT_TITLE_TEXT,
+            'description': description[:500] if description else Crawler.DEFAULT_DESCRIPTION_TEXT,
             'image_path': image_path,
             'favicon_path': favicon_path
         }
