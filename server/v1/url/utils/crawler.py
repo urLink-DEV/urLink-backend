@@ -1,4 +1,6 @@
 import asyncio
+import time
+from pprint import pprint
 from urllib.parse import urlparse
 
 import aiohttp
@@ -11,6 +13,7 @@ class Crawler:
     IMAGE_FAVICON = 'https://urlink.s3.ap-northeast-2.amazonaws.com/static/favicon.png'
     DEFAULT_TITLE_TEXT = '제목을 가져오지 못했어요. 직접 제목을 입력해보세요.'
     DEFAULT_DESCRIPTION_TEXT = '본문을 가져오지 못했어요. 저장한 링크의 내용을 간단히 기록해보세요.'
+    MAXIMUM_PATH_LENGTH = 500
     HEADERS = {
         'Connection': 'keep-alive',
         'Pragma': 'no-cache',
@@ -71,24 +74,37 @@ class Crawler:
         else:
             return path
 
-    def check_path(self, type, path):
+    def examine_image_or_favicon_path(self, type, path):
         default_path_dict = {"image": Crawler.IMAGE_404, "favicon": Crawler.IMAGE_FAVICON}
 
         if path is None:
             return default_path_dict[type]
         else:
             path = self.attach_full_scheme_on_path(path)
+            if len(path) > Crawler.MAXIMUM_PATH_LENGTH:
+                path = self.shorten_path(path)
+
             if self.is_correct_image(path):
                 return path
             else:
                 return default_path_dict[type]
 
-    def parse_html(self, html):
+    @staticmethod
+    def shorten_path(path):
+        response = requests.post('https://cutt.ly/scripts/shortenUrl.php', data={'url': path, 'domain': '0'})
+        if response.ok:
+            return response.text
+        else:
+            return None
+
+    def parse_html(self, path, html):
         soup = BeautifulSoup(html, 'html.parser')
         head = soup.head
+        path = path if len(path) <= Crawler.MAXIMUM_PATH_LENGTH else self.shorten_path(path)
 
         if not head:
             return {
+                'path': path,
                 'title': Crawler.DEFAULT_TITLE_TEXT,
                 'description': Crawler.DEFAULT_DESCRIPTION_TEXT,
                 'image_path': Crawler.IMAGE_404,
@@ -100,11 +116,13 @@ class Crawler:
         else:
             title = self.get_meta_data(head, [{'name': 'title'}, {'property': 'og:title'}])
         description = self.get_meta_data(head, [{'name': 'description'}, {'property': 'og:description'}])
-        image_path = self.check_path("image", self.get_meta_data(head, [{'property': 'og:image'},
-                                                                        {'property': 'twitter:image'}]))
-        favicon_path = self.check_path("favicon", self.get_favicon(head, [{'rel': 'shortcut icon'}, {'rel': 'icon'}]))
+        image_path = self.examine_image_or_favicon_path("image", self.get_meta_data(head, [{'property': 'og:image'},
+                                                                                           {'property': 'twitter:image'}]))
+        favicon_path = self.examine_image_or_favicon_path("favicon", self.get_favicon(head, [{'rel': 'shortcut icon'},
+                                                                                             {'rel': 'icon'}]))
 
         return {
+            'path': path,
             'title': title[:500] if title else Crawler.DEFAULT_TITLE_TEXT,
             'description': description[:500] if description else Crawler.DEFAULT_DESCRIPTION_TEXT,
             'image_path': image_path,
@@ -113,17 +131,14 @@ class Crawler:
 
 
 async def main():
-    c = Crawler()
-    for i in [c.parse_html(i) for i in (await asyncio.gather(*[c.get_html_by_async(url) for url in urls]))]:
+    for i in [c.parse_html(urls[idx], html) for idx, html in
+              enumerate(await asyncio.gather(*[c.get_html_by_async(url) for url in urls]))]:
         pprint(i)
 
 
 if __name__ == "__main__":
-    from pprint import pprint
-    import time
-
-    urls = ['abc',
-            'https://woowabros.github.io/experience/2020/10/08/excel-download.html',
+    c = Crawler()
+    urls = ['https://woowabros.github.io/experience/2020/10/08/excel-download.html',
             'https://programmers.co.kr/learn/challenges?tab=all_challenges',
             'https://www.acmicpc.net/',
             'https://ssungkang.tistory.com/category/%EC%9B%B9%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D/Django',
@@ -143,12 +158,12 @@ if __name__ == "__main__":
     asyncio.run(main())
     print("async : ", time.time() - start)
 
-    # 2. sync
     time.sleep(5)
+
+    # 2. sync
     print("###sync start###")
     start = time.time()
-    c = Crawler()
     for path in urls:
         html = c.get_html_by_sync(path)
-        pprint(c.parse_html(html))
+        pprint(c.parse_html(path, html))
     print("sync : ", time.time() - start)
