@@ -110,6 +110,7 @@ WSGI_APPLICATION = 'urlink.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 if gethostname().startswith('urlink'):
+    DEBUG = False
     secrets = json.load(open(os.path.join(os.path.join(BASE_DIR, 'urlink'), 'secrets.json'), 'rb'))
     DATABASES = {
         'default': {
