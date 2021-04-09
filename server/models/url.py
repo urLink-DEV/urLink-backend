@@ -33,8 +33,11 @@ class UrlSerializer(serializers.ModelSerializer):
         model = Url
         fields = '__all__'
 
-    def get_has_alarms(self, url):
-        return url.alarms.exists()
+    def get_has_alarms(self, url):  # 아직 안울린 알람이 있는지 확인
+        for alarm in url.alarms.all():
+            if not alarm.has_been_sent:
+                return True
+        return False
 
     def update(self, instance, validated_data):
         if validated_data.get('path'):
