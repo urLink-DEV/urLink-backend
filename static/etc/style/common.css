@@ -1,0 +1,238 @@
+/*===================================
+공통
+===================================*/
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 20px;
+  -webkit-text-size-adjust: none;
+}
+
+body {
+  margin: 0;
+  background-color: #fff;
+  font-family: 'NanumSquare', sans-serif;
+  color: #606060;
+  word-break: keep-all;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-weight: 700;
+}
+
+ul,
+p {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: #606060;
+  text-decoration: none;
+}
+
+em {
+  font-style: normal;
+}
+
+
+/*===================================
+레이아웃
+===================================*/
+.grid {
+  max-width: 972px;
+  margin: 0 auto;
+}
+
+
+/*===================================
+헤더
+===================================*/
+header {
+  position: absolute;
+  top: 2.5rem;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  padding: 1rem 0;
+  /* margin-top: 3.7rem; */
+}
+
+header.fixed {
+  position: fixed;
+  top: 0;
+}
+
+header.fixed.career {
+  border-bottom: 1px solid;
+  border-bottom-color: #606060;
+  /* background-color: #000; */
+}
+
+header.fixed.newcomer {
+  background-color: #000;
+}
+
+header .grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  flex-shrink: 0;
+  width: 6.8rem;
+  height: 1.4rem;
+  /* background: url(../images/common/ci.png) no-repeat; */
+  background-size: 100% auto;
+  font-size: 0;
+}
+
+header h1 a {
+  display: block;
+  height: 100%;
+}
+
+header nav ul {
+  display: flex;
+}
+
+header nav ul li {
+  margin-left: 1.8rem;
+  font-size: 0.825rem;
+  font-weight: 700;
+}
+
+header nav ul li:first-child {
+  margin-left: 0;
+}
+
+header nav ul li a {
+  /* color: #fff; */
+}
+
+header nav ul li a.primary {
+  color: #fff;
+}
+
+.main {
+  margin-top: 68px;
+  height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main__banner {
+  display: block;
+  object-fit: cover;
+  border-radius: 0px;
+  width: 100%;
+  height: 30vh;
+  opacity: 1;
+  object-position: center 50%;
+}
+
+/*===================================
+풋터
+===================================*/
+footer {
+  padding: 2.7rem 0 2.7rem;
+  background-color: #000;
+}
+
+.partners {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.partners li img {
+  width: auto;
+  height: 1.6rem;
+}
+
+
+/*===================================
+미디어쿼리
+===================================*/
+@media all and (max-width: 1109px) {
+
+  /*===================================
+	레이아웃
+	===================================*/
+  .grid {
+    max-width: none;
+    margin: 0 20px;
+  }
+}
+
+@media all and (max-width: 896px) {
+
+  /*===================================
+	공통
+	===================================*/
+  html {
+    font-size:
+      /*18px*/
+      16.5px;
+  }
+}
+
+@media all and (max-width: 600px) {
+
+  /*===================================
+	헤더
+  ===================================*/
+  header h1 {
+    width: 6rem;
+    height: 1.3rem;
+  }
+
+  header .grid {
+    margin-right: 0;
+  }
+
+  header nav {
+    /* width: calc(100% - 7.4rem); */
+    /* padding-left: 2rem; */
+  }
+
+  header nav ul {
+    overflow-x: auto;
+  }
+
+  header nav ul li {
+    display: none;
+    flex: none;
+  }
+
+  header nav ul li:last-child {
+    display: block;
+    padding-right: 20px;
+    font-size: 1rem;
+  }
+
+  header nav ul li a.primary {
+    color: #1ef995;
+  }
+}
+
+@media all and (max-width: 414px) {
+
+  /*===================================
+	공통
+	===================================*/
+  html {
+    font-size:
+      /*16px*/
+      13px;
+  }
+}
