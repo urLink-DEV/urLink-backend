@@ -6,6 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from server.exceptions import ServerException
@@ -14,6 +15,11 @@ from server.models.url import Url, UrlSerializer
 from server.models.url import UrlFilter
 from server.permissions import IsOwner
 from server.v1.url.utils.crawler import Crawler
+
+
+class CustomPageNumberPagination(PageNumberPagination):
+    page_size = 30
+    page_size_query_param = 'limit'
 
 
 class UrlListCreateAPIView(generics.ListCreateAPIView):
@@ -34,12 +40,25 @@ class UrlListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = UrlSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = UrlFilter
+    pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
         user = self.request.user.pk
         category = self.request.query_params.get('category')
         queryset = Url.objects.filter(user=user, category=category)
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if (self.request.query_params.get("page") is not None or self.request.query_params.get("limit") is not None) \
+                and page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     async def gather_url_infos(self, request, *args, **kwargs):
         crawler = Crawler()
