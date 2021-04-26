@@ -159,7 +159,7 @@ class GoogleSignInView(views.APIView):
             return Response(content, status=status.HTTP_401_UNAUTHORIZED)
 
         try:
-            user = User.objects.get(email=response['email'])
+            user = User.objects.get(email=response['email'], sign_up_type="google")
             login(self.request, user)
             return Response(UserSerializer(user).data)
         except User.DoesNotExist:
