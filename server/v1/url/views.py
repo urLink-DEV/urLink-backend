@@ -45,7 +45,7 @@ class UrlListCreateAPIView(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user.pk
         category = self.request.query_params.get('category')
-        queryset = Url.objects.filter(user=user, category=category)
+        queryset = Url.objects.filter(user=user, category=category, deleted=False)
         return queryset
 
     def list(self, request, *args, **kwargs):
@@ -108,3 +108,7 @@ class UrlRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 
     def put(self, request, *args, **kwargs):
         raise ServerException('PUT Method는 허용되지 않습니다.')
+
+    def delete(self, request, *args, **kwargs):
+        request.data['deleted'] = True
+        return self.partial_update(request, *args, **kwargs)
