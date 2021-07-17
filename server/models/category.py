@@ -78,7 +78,7 @@ class CategorySerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def get_url_count(self, category):
-        return category.urls.count()
+        return category.urls.filter(deleted=False).count()
 
     def create(self, validated_data):
         instance = super().create(validated_data)
