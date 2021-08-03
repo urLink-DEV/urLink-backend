@@ -1,0 +1,1 @@
+{"version":3,"sources":["pages/Home/IntroSection/styles.tsx"],"names":["ButtonWrapper","styled"],"mappings":"mMAEaA,EAAgBC,YAAO,MAAPA,CAAH","file":"static/js/18.299947bd.chunk.js","sourcesContent":["import styled from 'styled-components'\n\nexport const ButtonWrapper = styled('div')`\n  margin-top: 2.3rem;\n  margin-bottom: 5rem;\n`\n"],"sourceRoot":""}
