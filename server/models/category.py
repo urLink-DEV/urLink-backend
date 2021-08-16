@@ -4,6 +4,7 @@ from django.db.models import F
 from rest_framework import serializers
 
 from server.exceptions import ServerException
+from server.models.url import add_default_url
 
 
 class CustomCategoryManager(models.Manager):
@@ -82,6 +83,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         instance = super().create(validated_data)
+        add_default_url(instance.user, instance)
         if instance.order != 1:
             return Category.objects.move(instance, 1)
         return instance

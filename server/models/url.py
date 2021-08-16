@@ -4,12 +4,21 @@ from django_filters import rest_framework as rest_framework_filters
 from rest_framework import serializers
 
 from server.exceptions import ServerException
-from server.models.category import Category
+
+DEFAULT_URL_INFO = {
+    'path': 'https://docs.google.com/forms/u/2/d/1Th2nvY2v0mkqPTzJ6tCes0GTMJozZvAV5DzqkgIbrME/edit',
+    'title': '서비스 개선에 참여해주세요',
+    'description': '유어링크를 사용하면서 불편하거나\n개선할 점이 있다면 의견을 남겨주세요.',
+    'favicon_path': 'https://urlink.s3.ap-northeast-2.amazonaws.com/static/favicon.png',
+    'image_path': 'https://urlink.s3.ap-northeast-2.amazonaws.com/static/service-improvement.png',
+    'user': None,
+    'category': None
+}
 
 
 class Url(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='urls', on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, related_name='urls', on_delete=models.CASCADE)
+    category = models.ForeignKey('Category', related_name='urls', on_delete=models.CASCADE)
     path = models.CharField(max_length=500)
     title = models.CharField(max_length=500)
     description = models.CharField(max_length=500)
@@ -53,3 +62,9 @@ class UrlFilter(rest_framework_filters.FilterSet):
     class Meta:
         model = Url
         fields = ['path', 'title']
+
+
+def add_default_url(user, category):
+    DEFAULT_URL_INFO['user'] = user
+    DEFAULT_URL_INFO['category'] = category
+    Url.objects.create(**DEFAULT_URL_INFO)
