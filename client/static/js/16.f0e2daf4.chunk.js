@@ -1,0 +1,2 @@
+(this["webpackJsonpurlink-homepage"]=this["webpackJsonpurlink-homepage"]||[]).push([[16],{75:function(n,t,e){"use strict";e.r(t),e.d(t,"ContentsWrapper",(function(){return p})),e.d(t,"ButtonWrapper",(function(){return c}));var r,o,a=e(4),i=e(5),p=Object(i.b)("div")(r||(r=Object(a.a)(["\n  h1,\n  p {\n    color: #fff;\n  }\n"]))),c=Object(i.b)("div")(o||(o=Object(a.a)(["\n  margin-top: 2.3rem;\n  margin-bottom: 5rem;\n\n  @media screen and (max-width: 576px) {\n    margin-bottom: 0;\n  }\n"])))}}]);
+//# sourceMappingURL=16.f0e2daf4.chunk.js.map
