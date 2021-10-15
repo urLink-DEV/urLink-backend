@@ -1,0 +1,2 @@
+(this["webpackJsonpurlink-homepage"]=this["webpackJsonpurlink-homepage"]||[]).push([[18],{78:function(n,t,e){"use strict";e.r(t),e.d(t,"ButtonWrapper",(function(){return p}));var r,i=e(4),o=e(5),p=Object(o.b)("div")(r||(r=Object(i.a)(["\n  margin-top: 2.3rem;\n  margin-bottom: 5rem;\n"])))}}]);
+//# sourceMappingURL=18.c560fb47.chunk.js.map
